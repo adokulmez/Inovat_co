@@ -29,7 +29,7 @@ def download_API(url) -> DataFrame:
     with session.get(url) as response:
         print(f"{response} from {url}") #response 200 is the meaning succeed
     download_API.task_done()
-    return pd.DataFrame(results)
+    return pd.DataFrame(results) 
 
 def download_all_APIs(APIs) :
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
