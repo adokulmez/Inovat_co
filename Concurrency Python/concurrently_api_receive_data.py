@@ -1,9 +1,8 @@
 import threading, queue
 import os
 import requests
-import pandas as pd, numpy as np
+import pandas as pd#, numpy as np
 import time
-import csv
 from pandas.core.frame import DataFrame
 
 base_url = 'https://fakestoreapi.com'
@@ -16,8 +15,6 @@ failed_requests = []
 def worker(worker_num:int, q:queue) -> None:
     with requests.Session() as session:
         while True:
-            i=0
-            i=i+1
             set().add(f'Worker: {worker_num}, PID: {os.getpid()}, TID: {threading.get_ident()}')
             category, id = q.get()
             endpoint = f'/{category}?id={id}'
@@ -27,7 +24,7 @@ def worker(worker_num:int, q:queue) -> None:
                 results.append(response.json())
             else:
                 failed_requests.append((category, id))
-            q.task_done() 
+            q.task_done()
 
 def main() -> DataFrame:
     # Create queue and add items
@@ -56,11 +53,11 @@ if __name__ == "__main__":
         os.mkdir(cwd+"/ApiExport")
     except OSError as error: 
         print(error)
+
     start_time = time.time()
     df = main()
     l = [1,2]
     l_mod = [0] + l + [max(l)+1]
-
     list_of_dfs = [df.iloc[l_mod[n]:l_mod[n+1]] for n in range(len(l_mod)-1)]
     list_of_dfs[0].to_csv('ApiExport/product.csv')
     list_of_dfs[1].to_csv('ApiExport/users.csv')

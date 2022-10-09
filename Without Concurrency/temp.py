@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import requests
 import csv
 import os
+
 
 
 cwd = os.getcwd()
@@ -24,4 +24,3 @@ with open('data/products.csv', 'w') as file:
     writer = csv.writer(file)
     writer.writerow(response.json())
 file.close()
-

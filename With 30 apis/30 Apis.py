@@ -2,18 +2,11 @@ import concurrent.futures
 import requests
 import threading
 import time
-import pandas as pd, numpy as np
+import pandas as pd
 from pandas.core.frame import DataFrame
-import threading, queue
-import os
 import csv
-import asyncio
-import aiohttp
 
 
-
-
-df=[]
 results=[]
 failed_requests = []
 
@@ -34,12 +27,12 @@ def download_API(url) -> DataFrame:
     else:
         failed_requests.append() 
     with session.get(url) as response:
-        print(f"Read {len(response.content)} from {url}")
+        print(f"{response} from {url}") #response 200 is the meaning succeed
     download_API.task_done()
     return pd.DataFrame(results)
 
 def download_all_APIs(APIs) :
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         executor.map(download_API, APIs)
         
 
@@ -77,7 +70,7 @@ if __name__ == "__main__":
         'https://fakestoreapi.com/users/10'
         
     ]
-    start_time = time.time()
+    start_time = time.time() #start timer for measure completion time
     download_all_APIs(APIs)
     
     myFile = open('demo_file.csv', 'w')
@@ -87,10 +80,19 @@ if __name__ == "__main__":
         writer.writerow(data_list)
     myFile.close()
     
+    #convert "results" list to DataFrame for partitation '.csv' file
+    df = pd.DataFrame (results)
+    l = [19,29]
+    l_mod = [0] + l + [max(l)+1]
+    list_of_dfs = [df.iloc[l_mod[n]:l_mod[n+1]] for n in range(len(l_mod)-1)]
+    list_of_dfs[0].to_csv('product.csv')
+    list_of_dfs[1].to_csv('users.csv')
+    
+    #check data from console (You can delete if necessey)
     myFile = open('demo_file.csv', 'r')
     print("The content of the csv file is:")
     print(myFile.read())
     myFile.close()
     
-    duration = time.time() - start_time
+    duration = time.time() - start_time #measure completion time
     print(f"Downloaded {len(APIs)} in {duration} seconds")
